@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:c="http://www.springframework.org/schema/c" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       default-lazy-init="true">
+    <bean id="messageProvider" class="com.apress.prospring4.ch3.ConfigurableMessageProvider">
+        <constructor-arg value="Configurable message"/>
+    </bean>
+    <bean id="messageRenderer" class="com.apress.prospring4.ch3.StandardOutMessageRenderer">
+        <property name="messageProvider" ref="messageProvider"/>
+    </bean>
+    <bean id="constructorConfusion" class="com.apress.prospring4.ch3.ConstructorConfusion">
+        <constructor-arg type="int">
+            <value>90</value>
+        </constructor-arg>
+    </bean>
+    <bean id="injectSimple" class="com.apress.prospring4.ch3.InjectSimple"
+          p:name="Chris Schaefer" p:age="32" p:ageInSeconds="1009843200"
+          p:programmer="true" p:height="1.778"/>
+    <bean id="injectSimpleConfig" class="com.apress.prospring4.ch3.InjectSimpleConfig"/>
+    <bean id="injectSimpleSpel" class="com.apress.prospring4.ch3.InjectSimpleSpel"
+          p:name="#{injectSimpleConfig.name}"
+          p:age="#{injectSimpleConfig.age + 22}"
+          p:ageInSeconds="#{injectSimpleConfig.ageInSeconds}"
+          p:programmer="#{injectSimpleConfig.programmer}"
+          p:height="#{injectSimpleConfig.height}"/>
+    <bean id="oracle" name="wiseworm" class="com.apress.prospring4.ch3.BookwormOracle"/>
+    <bean id="injectRef" class="com.apress.prospring4.ch3.InjectRef">
+        <property name="oracle" ref="wiseworm"/>
+    </bean>
+    <bean id="target1" class="com.apress.prospring4.ch3.SimpleTarget" p:val-ref="injectBean"/>
+    <bean id="target2" class="com.apress.prospring4.ch3.SimpleTarget" p:val-ref="injectBean"/>
+    <bean id="target3" class="com.apress.prospring4.ch3.SimpleTarget">
+        <property name="val">
+            <ref bean="injectBean"/>
+        </property>
+    </bean>
+    <bean id="injectBean" class="java.lang.String" c:_0="Child In Bean"/>
+
+    <bean id="injectCollection" class="com.apress.prospring4.ch3.CollectionInjection">
+        <property name="map">
+            <map>
+                <entry key="someValue">
+                    <value>Hello World!</value>
+                </entry>
+                <entry key="someBean">
+                    <ref bean="oracle"/>
+                </entry>
+            </map>
+        </property>
+        <property name="props">
+            <props>
+                <prop key="firstName">Chris</prop>
+                <prop key="secondName">Schaefer</prop>
+            </props>
+        </property>
+        <property name="set">
+            <set>
+                <value>Hello World!</value>
+                <ref bean="oracle"/>
+            </set>
+        </property>
+        <property name="list">
+            <list>
+                <value>Hello World!</value>
+                <ref bean="oracle"/>
+            </list>
+        </property>
+    </bean>
+    <bean id="helper" class="com.apress.prospring4.ch3.MyHelper" scope="prototype"/>
+    <bean id="abstractLookupBean" class="com.apress.prospring4.ch3.AbstractLookupDemoBean">
+        <lookup-method name="getMyHelper" bean="helper"/>
+    </bean>
+    <bean id="standardLookupBean" class="com.apress.prospring4.ch3.StandardLookupDemoBean">
+        <property name="myHelper">
+            <ref bean="helper"/>
+        </property>
+    </bean>
+
+    <bean id="methodReplacer" class="com.apress.prospring4.ch3.FormatMessageReplacer"/>
+    <bean id="replacementTarget" class="com.apress.prospring4.ch3.ReplacementTarget">
+        <replaced-method name="formatMessage" replacer="methodReplacer">
+            <arg-type>String</arg-type>
+        </replaced-method>
+    </bean>
+    <bean id="standardTarget" class="com.apress.prospring4.ch3.ReplacementTarget"/>
+    <bean id="parentSimpleBean" class="com.apress.prospring4.ch3.SimpleBean" abstract="true" p:name="Alex" p:age="22"/>
+    <bean id="childSimpleBean" class="com.apress.prospring4.ch3.SimpleBean" parent="parentSimpleBean" p:age="32"/>
+    <bean id="simpleBean1" class="com.apress.prospring4.ch4.SimpleBeanWithInterface"
+          p:name="Chris Schaefer" p:age="32"/>
+    <bean id="simpleBean2" class="com.apress.prospring4.ch4.SimpleBeanWithInterface"
+          p:age="32"/>
+    <bean id="simpleBean3" class="com.apress.prospring4.ch4.SimpleBeanWithInterface"
+          p:name="Chris Schaefer"/>
+    <bean id="destructiveBean" class="com.apress.prospring4.ch4.DestructiveBeanWithInterface"
+          p:filePath="test.txt"/>
+    <bean id="beanNamePrinter" class="com.apress.prospring4.ch4.BeanNamePrinter"/>
+    <bean id="shaDigest" class="com.apress.prospring4.ch4.MessageDigestFactoryBean"
+          p:algorithmName="SHA1"/>
+    <bean id="defaultDigest" class="com.apress.prospring4.ch4.MessageDigestFactoryBean"/>
+    <bean id="digester" class="com.apress.prospring4.ch4.MessageDigester"
+          p:digest1-ref="shaDigest" p:digest2-ref="defaultDigest"/>
+
+    <bean id="shaDigestFactory" class="com.apress.prospring4.ch4.MessageDigestFactory"
+          p:algorithmName="SHA1"/>
+    <bean id="defaultDigestFactory" class="com.apress.prospring4.ch4.MessageDigestFactory"/>
+    <bean id="shaDigest1" factory-bean="shaDigestFactory" factory-method="createInstance"/>
+    <bean id="defaultDigest1" factory-bean="defaultDigestFactory" factory-method="createInstance"/>
+    <bean id="digester1" class="com.apress.prospring4.ch4.MessageDigester"
+          p:digest1-ref="shaDigest1" p:digest2-ref="defaultDigest1"/>
+
+    <util:list id="stringList">
+        <value>String member 1</value>
+        <value>String member 2</value>
+    </util:list>
+    <util:list id="properytEditorRegistrarsList">
+        <bean class="com.apress.prospring4.ch4.PropertyEditorBean$CustomPropertyEditorRegistrar"/>
+    </util:list>
+
+    <bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer"
+          p:propertyEditorRegistrars-ref="properytEditorRegistrarsList">
+        <property name="customEditors">
+            <map>
+                <entry key="com.apress.prospring4.ch4.Name"
+                       value="com.apress.prospring4.ch4.NamePropertyEditor"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="builtInSample" class="com.apress.prospring4.ch4.PropertyEditorBean"
+          p:bytes="Hello World"
+          p:cls="java.lang.String"
+          p:trueOrFalse="true"
+          p:stringList-ref="stringList"
+
+          p:floatValue="123.45678"
+          p:date="05/03/13"
+          p:file="test.txt"
+          p:locale="en_US"
+          p:pattern="a*b"
+          p:properties="name=Chris age=32"
+          p:trimString=" String need trimming"
+          p:url="http://www.springframework.org"/>
+
+    <bean id="exampleBean" class="com.apress.prospring4.ch4.CustomEditorExample"
+          p:name="Chris Schaefer"/>
+
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource"
+          p:basenames-ref="basenames"/>
+    <util:list id="basenames">
+        <value>buttons</value>
+        <value>labels</value>
+    </util:list>
+
+    <bean id="publisher" class="com.apress.prospring4.ch4.Publisher"/>
+    <bean id="messageEventListener" class="com.apress.prospring4.ch4.MessageEventListener"/>
+
+    <bean id="messageRenderer4" class="com.apress.prospring4.ch4.StandardOutMessageRenderer"
+          p:messageProvider-ref="messageProvider4"/>
+    <bean id="messageProvider4" class="com.apress.prospring4.ch4.ConfigurableMessageProvider"
+          c:message="This is a configurable message"/>
+</beans>
