@@ -1,8 +1,7 @@
 package com.apress.prospring4.ch6;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,7 +32,29 @@ public class PlainContactDao implements ContactDao {
 
     @Override
     public List<Contact> findAll() {
-        return null;
+        List<Contact> result = new ArrayList<Contact>();
+        Connection connection = null;
+
+        try{
+            connection = getConnection();
+            PreparedStatement statement = connection.prepareStatement("select * from contact");
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()){
+                Contact contact = new Contact();
+                contact.setId(resultSet.getLong("id"));
+                contact.setFirstName(resultSet.getString("first_name"));
+                contact.setLastName(resultSet.getString("last_name"));
+                contact.setBirthDate(resultSet.getDate("birth_date"));
+
+                result.add(contact);
+            }
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }finally {
+            closeConnection(connection);
+        }
+        return result;
     }
 
     @Override
